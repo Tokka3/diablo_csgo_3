@@ -1036,7 +1036,7 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 		//	*/D::AddLine(childPos, ParentPos, Color(255, 255, 255, 255), C::Get<int>(Vars.iSkeletonThickness));
 		//}
 		//
-		Box(ctx.box, C::Get<int>(Vars.iEspMainPlayerBox), colBox, Color(0, 0, 0, 150));
+		Box(ctx.box, C::Get<int>(Vars.iEspMainPlayerBox), colBox, Color(0, 0, 0, 150), isVisible);
 
 		if (C::Get<bool>(Vars.bSkeleton)) {
 			if (const auto pModel = pEntity->GetModel(); pModel != nullptr)
@@ -1209,14 +1209,14 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 	#pragma endregion
 }
 
-void CVisuals::Box(const Box_t& box, const int nBoxType, const Color& colPrimary, const Color& colOutline)
+void CVisuals::Box(const Box_t& box, const int nBoxType, const Color& colPrimary, const Color& colOutline, bool isVisible)
 {
 
 	bool fill = C::Get<bool>(Vars.bFill);
-	bool outline = C::Get<bool>(Vars.bOutline);
-	Color fillColor = C::Get<Color2>(Vars.cFillColour).visible;
-	Color outlineColor = C::Get<Color2>(Vars.cOutlineColour).visible;
-	Color espColor = C::Get<Color2>(Vars.cBoxColour).visible;
+	bool outline =  C::Get<bool>(Vars.bOutline);
+	Color fillColor = isVisible ? C::Get<Color2>(Vars.cFillColour).visible :  C::Get<Color2>(Vars.cFillColour).notVisible ;
+	Color outlineColor = isVisible ? C::Get<Color2>(Vars.cOutlineColour).visible : C::Get<Color2>(Vars.cOutlineColour).notVisible;
+	Color espColor = isVisible ? C::Get<Color2>(Vars.cBoxColour).visible :  C::Get<Color2>(Vars.cBoxColour).notVisible;
 	switch (static_cast<EVisualsBoxType>(nBoxType))
 	{
 	case EVisualsBoxType::FULL:

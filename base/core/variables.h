@@ -133,8 +133,8 @@ struct Variables_t
 	C_ADD_VARIABLE(Color, colEspMainBoxAlliesWall, Color(170, 110, 200, 255));
 	
 	// enemies
-	C_ADD_VARIABLE(Color2, cBoxColour, Color2(Color(255, 255, 255, 255), Color(255, 255, 255, 255)));
-	C_ADD_VARIABLE(Color2, cFillColour, Color2(Color(0, 0, 0, 45), Color(100, 0, 0, 45)));
+	C_ADD_VARIABLE(Color2, cBoxColour, Color2(Color(255, 255, 255, 245), Color(255, 0, 0, 245)));
+	C_ADD_VARIABLE(Color2, cFillColour, Color2(Color(1, 1, 1, 45), Color(100, 1, 1, 45)));
 	C_ADD_VARIABLE(Color2, cOutlineColour, Color2(Color(0, 0, 0, 255), Color(0, 0, 0, 255)));
 	C_ADD_VARIABLE(Color2, cSkeletonColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cHealthBarColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));

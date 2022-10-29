@@ -2992,10 +2992,10 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
             col1 = DrawColourPickerMA(x + margin + maxwidth, y + 35, spareColours[&col1], data[0], label, mulColMGR[std::make_pair(label, data[0])].isActive, col1);
             DrawRectQ(x + margin + maxwidth - 1, y + 35 - 1, 42, 21, 5, IM_COL32(38, 38, 38, 255));
-            col2 = DrawColourPickerMA(x + margin + maxwidth, y + 60, spareColours[&col2], data[1], label, mulColMGR[std::make_pair(label, data[1])].isActive, col1);
+            col2 = DrawColourPickerMA(x + margin + maxwidth, y + 60, spareColours[&col2], data[1], label, mulColMGR[std::make_pair(label, data[1])].isActive, col2);
             DrawRectQ(x + margin + maxwidth - 1, y + 60 - 1, 42, 21, 5, IM_COL32(38, 38, 38, 255));
             if (data.size() == 3) {
-                col3 = DrawColourPickerMA(x + margin + maxwidth, y + 85, spareColours[&col3], data[2], label, mulColMGR[std::make_pair(label, data[2])].isActive, col1);
+                col3 = DrawColourPickerMA(x + margin + maxwidth, y + 85, spareColours[&col3], data[2], label, mulColMGR[std::make_pair(label, data[2])].isActive, col3);
                 DrawRectQ(x + margin + maxwidth - 1, y + 85 - 1, 42, 21, 5, IM_COL32(38, 38, 38, 255));
             }
             DrawRectQ(x + margin, y + 30, maxwidth + 44, data.size() * 25 + 4, 3, IM_COL32(32, 32, 32, 255));
