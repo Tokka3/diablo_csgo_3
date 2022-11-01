@@ -95,6 +95,7 @@ struct Variables_t
 	C_ADD_VARIABLE(bool, bSkeleton, false);
 	C_ADD_VARIABLE(bool, bHealthbar, false);
 	C_ADD_VARIABLE(bool, bAmmoBar, false);
+	
 	C_ADD_VARIABLE(bool, bArmorBar, false);
 	C_ADD_VARIABLE(bool, bName, false);
 	C_ADD_VARIABLE(bool, bWeapon, false);
@@ -110,6 +111,7 @@ struct Variables_t
 	C_ADD_VARIABLE(bool, bSkeletonA, false);
 	C_ADD_VARIABLE(bool, bHealthbarA, false);
 	C_ADD_VARIABLE(bool, bAmmoBarA, false);
+
 	C_ADD_VARIABLE(bool, bArmorBarA, false);
 	C_ADD_VARIABLE(bool, bNameA, false);
 	C_ADD_VARIABLE(bool, bWeaponA, false);
@@ -118,6 +120,7 @@ struct Variables_t
 	C_ADD_VARIABLE(bool, bDistanceA, false);
 	
 
+
 	// players
 	C_ADD_VARIABLE(bool, bEspEnemiesBox, true);
 
@@ -125,6 +128,9 @@ struct Variables_t
 	C_ADD_VARIABLE(bool, bWeaponsBox, true);
 	C_ADD_VARIABLE(int, iSkeletonThicknessA, static_cast<int>(EVisualsBoxType::FULL));
 	C_ADD_VARIABLE(int, iSkeletonThickness, static_cast<int>(EVisualsBoxType::FULL));
+
+	C_ADD_VARIABLE(int, iHealthStyle, 0);
+	C_ADD_VARIABLE(int, iHealthStyleA,0);
 	C_ADD_VARIABLE(int, iEspMainPlayerBox, static_cast<int>(EVisualsBoxType::FULL));
 	C_ADD_VARIABLE(int, iEspMainPlayerBoxA, static_cast<int>(EVisualsBoxType::FULL));
 	C_ADD_VARIABLE(Color, colEspMainBoxEnemies, Color(160, 60, 60, 255));
@@ -139,6 +145,7 @@ struct Variables_t
 	C_ADD_VARIABLE(Color2, cSkeletonColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cHealthBarColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cAmmoBarColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
+	C_ADD_VARIABLE(Color2, cAmmoBarColourOutline, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cArmorBarColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, colEspName, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cWeaponColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
@@ -148,12 +155,13 @@ struct Variables_t
 	C_ADD_VARIABLE(Color2, cDistanceColour, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 
 	//allies
-	C_ADD_VARIABLE(Color2, cBoxColourA, Color2(Color(255, 255, 255, 255), Color(255, 255, 255, 255)));
+	C_ADD_VARIABLE(Color2, cBoxColourA, Color2(Color(0, 255, 0, 255), Color(0, 255, 255, 120)));
 	C_ADD_VARIABLE(Color2, cFillColourA, Color2(Color(0, 0, 0, 45), Color(100, 0, 0, 45)));
 	C_ADD_VARIABLE(Color2, cOutlineColourA, Color2(Color(0, 0, 0, 255), Color(0, 0, 0, 255)));
 	C_ADD_VARIABLE(Color2, cSkeletonColourA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cHealthBarColourA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cAmmoBarColourA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
+	C_ADD_VARIABLE(Color2, cAmmoBarColourOutlineA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cArmorBarColourA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, colEspNameA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
 	C_ADD_VARIABLE(Color2, cWeaponColourA, Color2(Color(160, 60, 60, 255), Color(160, 60, 60, 255)));
@@ -193,6 +201,8 @@ struct Variables_t
 
 
 
+	C_ADD_VARIABLE(bool, bAmmoBarOutline, false);
+	C_ADD_VARIABLE(bool, bAmmoBarOutlineA, false);
 
 
 

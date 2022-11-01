@@ -13,9 +13,9 @@ public:
     void Begin();
     void End();
     void ChildBackGround(int col, int h);
-    void DrawCheckBox(bool& change, const char* label);
+    void DrawCheckBox(bool& change, const char* label, std::string id = "default");
     void DrawCheckBoxColourPicker(bool& change, Color& col, const char* label);
-    void DrawMultiPicker(bool& change, Color& col1, Color& col2, Color& col3, const char* label, std::vector<const char*> data = { "Visible", "Not Visible" }, std::string tooltip = "");
+    void DrawMultiPicker(bool& change, Color& col1, Color& col2, Color& col3, const char* label,  std::string id = "default", std::vector<const char*> data = { "Visible", "Not Visible" }, std::string tooltip = "");
   
     void DrawSliderInt(int& change, int min, int max, const char* label);
     void DrawSliderFloat(float& change, float min, float max, const char* label);

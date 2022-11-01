@@ -132,7 +132,7 @@ private:
 
 	// Entities
 	/* draw entity bounding box */
-	void Box(const Box_t& box, const int nBoxType, const Color& colPrimary, const Color& colOutline, bool isVisible = true);
+	void Box(const Box_t& box, const int nBoxType, const Color& colPrimary, const Color& colOutline, bool isVisible = true, bool isEnemy = true);
 	/* draw vertical line with health-based height */
 	void HealthBar(Context_t& ctx, const float flFactor, const Color& colPrimary, const Color& colBackground, const Color& colOutline);
 	/* draw horizontal line with ammo-based width */

@@ -342,6 +342,7 @@ public:
 	String b;
 	String hex;
 	int hexInt = 0;
+	bool copyPasteTab = false;
 	int timer = 0;
 	float hue = 0;
 	ImVec4 temp;

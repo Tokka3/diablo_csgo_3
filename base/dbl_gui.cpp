@@ -64,6 +64,7 @@ namespace Index {
 }
 namespace IGui {
 
+    Color ColorClipboard = Color(0, 0, 0, 0);
     animList PageTrans;
     std::string SearchSequence;
     bool categoryIDChange = false;
@@ -1171,6 +1172,12 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
             key_state[i] = GetAsyncKeyState(i);
         }
 
+        if (isOpen["copyPasteTab"].isOpen && isOpen["copyPasteTab"].waiting) {
+            if (!key_down(VK_LBUTTON)) {
+                isOpen["copyPasteTab"].isOpen = false;
+                isOpen["copyPasteTab"].waiting = false;
+            }
+        }
         if (IGui::waiting && IGui::GO) {
             if (!key_down(VK_LBUTTON)) {
                 IGui::GO = false;
@@ -1588,23 +1595,27 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         return active;
     }
 
-    void DrawCheckBoxA(int x, int y, bool& change, const char* label, std::string tooltip) {
+    void DrawCheckBoxA(int x, int y, bool& change, const char* label, std::string id, std::string tooltip) {
 
         tooltip += " ";
 
+        std::string preCut = label;
+        std::string idStr = preCut + id;
 
-        if (!aList[std::make_pair(categoryActiveID, label)].init) {
+        
+
+        if (!aList[std::make_pair(categoryActiveID, idStr)].init) {
             if (change) {
-                aList[std::make_pair(categoryActiveID, label)].startVal = 1;
-                aList[std::make_pair(categoryActiveID, label)].targetVal = 1;
-                aList[std::make_pair(categoryActiveID, label)].startVal = 1;
+                aList[std::make_pair(categoryActiveID, idStr)].startVal = 1;
+                aList[std::make_pair(categoryActiveID, idStr)].targetVal = 1;
+                aList[std::make_pair(categoryActiveID, idStr)].startVal = 1;
             }
             else {
-                aList[std::make_pair(categoryActiveID, label)].startVal = 0;
-                aList[std::make_pair(categoryActiveID, label)].targetVal = 0;
-                aList[std::make_pair(categoryActiveID, label)].value = 0;
+                aList[std::make_pair(categoryActiveID, idStr)].startVal = 0;
+                aList[std::make_pair(categoryActiveID, idStr)].targetVal = 0;
+                aList[std::make_pair(categoryActiveID, idStr)].value = 0;
             }
-            aList[std::make_pair(categoryActiveID, label)].init = true;
+            aList[std::make_pair(categoryActiveID, idStr)].init = true;
         }
 
         static int timer = 0;
@@ -1614,16 +1625,16 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         int width = CalcTextSize(label);
         ImGui::PopFont();
         if (cursorInRegion(x, y, IGui::CheckBoxWidth + width + 20, IGui::CheckBoxWidth)) {
-            cbMGR[std::make_pair(categoryActiveID, label)].hoverTimer += globalTimer;
+            cbMGR[std::make_pair(categoryActiveID, idStr)].hoverTimer += globalTimer;
             if (key_pressed(VK_LBUTTON) && !IGui::GO && !IGui::GK) {
                 change = !change;
 
             }
 
             if (key_pressed(VK_RBUTTON) && !IGui::GO && !IGui::GK && !tMGR["kbReady"].inProgress) {
-                 cbMGR[std::make_pair(categoryActiveID, label)].keyBindX = cp.x - menuPos.x;
-                 cbMGR[std::make_pair(categoryActiveID, label)].keyBindY = cp.y - menuPos.y;
-                 cbMGR[std::make_pair(categoryActiveID, label)].keyBindTab = ! cbMGR[std::make_pair(categoryActiveID, label)].keyBindTab;
+                 cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX = cp.x - menuPos.x;
+                 cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY = cp.y - menuPos.y;
+                 cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindTab = ! cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindTab;
                 ready = false;
                if (!tMGR["kbReady"].inProgress) tMGR["kbReady"].start = get_time();
 
@@ -1634,24 +1645,24 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         else {
 
            
-             cbMGR[std::make_pair(categoryActiveID, label)].spareClick = false;
+             cbMGR[std::make_pair(categoryActiveID, idStr)].spareClick = false;
         }
         if (change) {
-            aList[std::make_pair(categoryActiveID, label)].targetVal = 1;
+            aList[std::make_pair(categoryActiveID, idStr)].targetVal = 1;
 
 
 
         }
         else {
-            aList[std::make_pair(categoryActiveID, label)].targetVal = 0;
+            aList[std::make_pair(categoryActiveID, idStr)].targetVal = 0;
 
         }
 
 
-         cbMGR[std::make_pair(categoryActiveID, label)].aList.ay =  cbMGR[std::make_pair(categoryActiveID, label)].aList.targeta -  cbMGR[std::make_pair(categoryActiveID, label)].aList.a;
-         cbMGR[std::make_pair(categoryActiveID, label)].aList.a +=  cbMGR[std::make_pair(categoryActiveID, label)].aList.ay * 0.05;
+         cbMGR[std::make_pair(categoryActiveID, idStr)].aList.ay =  cbMGR[std::make_pair(categoryActiveID, idStr)].aList.targeta -  cbMGR[std::make_pair(categoryActiveID, idStr)].aList.a;
+         cbMGR[std::make_pair(categoryActiveID, idStr)].aList.a +=  cbMGR[std::make_pair(categoryActiveID, idStr)].aList.ay * 0.05;
         if (time_millis(tMGR[label].start)> 1000 && tooltip.size() > 10) {
-             cbMGR[std::make_pair(categoryActiveID, label)].aList.targeta = 1;
+             cbMGR[std::make_pair(categoryActiveID, idStr)].aList.targeta = 1;
             aList[std::make_pair(categoryActiveID, tooltip.c_str())].targetVal = 1;
             tMGR[label].inProgress = false;
         }
@@ -1670,7 +1681,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         //  xa = cp.x - menuPos.x;
          // ya = cp.y - menuPos.y;
         xa += 20;
-         cbMGR[std::make_pair(categoryActiveID, label)].spareClick = true;
+         cbMGR[std::make_pair(categoryActiveID, idStr)].spareClick = true;
 
 
         for (int i = 0; i < tooltip.size(); i++) {
@@ -1750,32 +1761,32 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
 
         }
-        if ( cbMGR[std::make_pair(categoryActiveID, label)].keyBindTab) {
+        if ( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindTab) {
 
-            if (key_pressed(VK_ESCAPE) && !justKeyBind && ! cbMGR[std::make_pair(categoryActiveID, label)].isListening) {
-                 cbMGR[std::make_pair(categoryActiveID, label)].keyBindTab = false;
+            if (key_pressed(VK_ESCAPE) && !justKeyBind && ! cbMGR[std::make_pair(categoryActiveID, idStr)].isListening) {
+                 cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindTab = false;
                 IGui::GK = false;
             }
             IGui::GK = true;
             IGui::DropDownWidth = 68;
-            isOpen = DrawDropDownA( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 47,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY - IGui::DropDownTextMargin + 3,  cbMGR[std::make_pair(categoryActiveID, label)].ToggleType, { "Toggle", "Hold" }, "null");
-            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 46,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 2, 70, 24, 4, IM_COL32(38, 38, 38, 255)); // background drop down
+            isOpen = DrawDropDownA( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 47,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY - IGui::DropDownTextMargin + 3,  cbMGR[std::make_pair(categoryActiveID, idStr)].ToggleType, { "Toggle", "Hold" }, "null");
+            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 46,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 2, 70, 24, 4, IM_COL32(38, 38, 38, 255)); // background drop down
 
-            if ( cbMGR[std::make_pair(categoryActiveID, label)].isListening) {
+            if ( cbMGR[std::make_pair(categoryActiveID, idStr)].isListening) {
 
-                DrawMessageQ(MenuModern,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 78,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 29, "...", IM_COL32(255, 255, 255, 255));
+                DrawMessageQ(MenuModern,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 78,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 29, "...", IM_COL32(255, 255, 255, 255));
                 for (int i = 0; i < 256; i++) {
                     if (key_pressed(i) && i != VK_LBUTTON) {
                         justKeyBind = true;
 
                         tMGR["justKeyBind"].start = get_time();
 
-                        if ( cbMGR[std::make_pair(categoryActiveID, label)].vkKey != VK_ESCAPE)
-                             cbMGR[std::make_pair(categoryActiveID, label)].vkKey = i;
-                        else   cbMGR[std::make_pair(categoryActiveID, label)].vkKey = 10000;
+                        if ( cbMGR[std::make_pair(categoryActiveID, idStr)].vkKey != VK_ESCAPE)
+                             cbMGR[std::make_pair(categoryActiveID, idStr)].vkKey = i;
+                        else   cbMGR[std::make_pair(categoryActiveID, idStr)].vkKey = 10000;
 
 
-                         cbMGR[std::make_pair(categoryActiveID, label)].isListening = false;
+                         cbMGR[std::make_pair(categoryActiveID, idStr)].isListening = false;
 
                         break;
                     }
@@ -1783,38 +1794,38 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
             }
             else {
                 ImGui::PushFont(MenuModern);
-                int width = CalcTextSize(key_names[ cbMGR[std::make_pair(categoryActiveID, label)].vkKey].c_str());
+                int width = CalcTextSize(key_names[ cbMGR[std::make_pair(categoryActiveID, idStr)].vkKey].c_str());
 
                 ImGui::PopFont();
-                int start =  cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 47;
+                int start =  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 47;
                 int end = 70;
                 int widtha = end - start;
-                DrawMessageQ(MenuModern, start + (end / 2) - width / 2,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 29, key_names[ cbMGR[std::make_pair(categoryActiveID, label)].vkKey].c_str(), IM_COL32(220, 220, 220, 255));
+                DrawMessageQ(MenuModern, start + (end / 2) - width / 2,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 29, key_names[ cbMGR[std::make_pair(categoryActiveID, idStr)].vkKey].c_str(), IM_COL32(220, 220, 220, 255));
             }
 
-            DrawMessageQ(MenuModern,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 5,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 5, "Mode", IM_COL32_WHITE);
-            DrawMessageQ(MenuModern,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 5,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 30, "Key", IM_COL32_WHITE);
-            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 47,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 29, 68, 22, 4, IM_COL32(35, 35, 35, 255)); // main keybind
-            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 46,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 28, 70, 24, 4, IM_COL32(38, 38, 38, 255)); // background keybind
+            DrawMessageQ(MenuModern,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 5,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 5, "Mode", IM_COL32_WHITE);
+            DrawMessageQ(MenuModern,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 5,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 30, "Key", IM_COL32_WHITE);
+            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 47,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 29, 68, 22, 4, IM_COL32(35, 35, 35, 255)); // main keybind
+            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 46,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 28, 70, 24, 4, IM_COL32(38, 38, 38, 255)); // background keybind
 
-            if (cursorInRegion( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX + 46,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY + 28, 70, 24)) {
+            if (cursorInRegion( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX + 46,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY + 28, 70, 24)) {
                 if (key_pressed(VK_LBUTTON) && !IGui::GO) {
                     
-                     cbMGR[std::make_pair(categoryActiveID, label)].isListening = ! cbMGR[std::make_pair(categoryActiveID, label)].isListening;
+                     cbMGR[std::make_pair(categoryActiveID, idStr)].isListening = ! cbMGR[std::make_pair(categoryActiveID, idStr)].isListening;
                 }
             }
 
 
 
-            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY, 118, 54, 4, IM_COL32(30, 30, 30, 255));
-            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX - 1,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY - 1, 120, 56, 4, IM_COL32(36, 36, 36, 255));
+            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY, 118, 54, 4, IM_COL32(30, 30, 30, 255));
+            DrawRectQ( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX - 1,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY - 1, 120, 56, 4, IM_COL32(36, 36, 36, 255));
 
 
         }
-        if (!cursorInRegion( cbMGR[std::make_pair(categoryActiveID, label)].keyBindX - 1,  cbMGR[std::make_pair(categoryActiveID, label)].keyBindY - 1, 110, 56)) {
+        if (!cursorInRegion( cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindX - 1,  cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindY - 1, 110, 56)) {
             if (key_pressed(VK_LBUTTON) || key_pressed(VK_RBUTTON)) {
                 if (!isOpen && !IGui::GO && time_millis(tMGR["kbReady"].start) > 30) {
-                     cbMGR[std::make_pair(categoryActiveID, label)].keyBindTab = false;
+                     cbMGR[std::make_pair(categoryActiveID, idStr)].keyBindTab = false;
                     IGui::waitingK = true;
                     tMGR["kbReady"].inProgress = false;
                 }
@@ -1824,11 +1835,11 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
 
 
-        animLinear(label, 100);
-        DrawImageQ(x - 1, y, 16, 16, IM_COL32(255, 255, 255, 255 * aList[std::make_pair(categoryActiveID, label)].value), tickTexture);
-        DrawRectQ(x, y, IGui::CheckBoxWidth, IGui::CheckBoxWidth, 3, IM_COL32(237, 36, 116, 255 * aList[std::make_pair(categoryActiveID, label)].value), ImDrawCornerFlags_All); // if clicked, draw link rectange with tick 
-         cbMGR[std::make_pair(categoryActiveID, label)].dx =  cbMGR[std::make_pair(categoryActiveID, label)].targetX -  cbMGR[std::make_pair(categoryActiveID, label)].X;
-         cbMGR[std::make_pair(categoryActiveID, label)].X +=  cbMGR[std::make_pair(categoryActiveID, label)].dx * 0.1;
+        animLinear(idStr, 100);
+        DrawImageQ(x - 1, y, 16, 16, IM_COL32(255, 255, 255, 255 * aList[std::make_pair(categoryActiveID, idStr)].value), tickTexture);
+        DrawRectQ(x, y, IGui::CheckBoxWidth, IGui::CheckBoxWidth, 3, IM_COL32(237, 36, 116, 255 * aList[std::make_pair(categoryActiveID, idStr)].value), ImDrawCornerFlags_All); // if clicked, draw link rectange with tick 
+         cbMGR[std::make_pair(categoryActiveID, idStr)].dx =  cbMGR[std::make_pair(categoryActiveID, idStr)].targetX -  cbMGR[std::make_pair(categoryActiveID, idStr)].X;
+         cbMGR[std::make_pair(categoryActiveID, idStr)].X +=  cbMGR[std::make_pair(categoryActiveID, idStr)].dx * 0.1;
 
         if (!StringInString("cockinass", tooltip)) {
             DrawRectQ(x + 2, y + 2, 11, 11, 2, IM_COL32(22, 22, 22, 255), ImDrawCornerFlags_All); // checkbox inside
@@ -1890,7 +1901,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
     }
 
 
-    void dbl::DrawCheckBox(bool& change, const char* label) {
+    void dbl::DrawCheckBox(bool& change, const char* label, std::string id) {
         if (!itemInKeywords(label)) {
             KeyWordInfo add;
             add.String = label;
@@ -1900,7 +1911,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
             keywordList.emplace_back(add);
 
         }
-        DrawCheckBoxA(childX, childY + elementSpacing, change, label, "");
+        DrawCheckBoxA(childX, childY + elementSpacing, change, label, id, "");
         elementSpacing += 23;
     }
 
@@ -1914,7 +1925,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
             keywordList.emplace_back(add);
 
         }
-        DrawCheckBoxA(childX, childY + elementSpacing, change, label, tooltip);
+       // DrawCheckBoxA(childX, childY + elementSpacing, change, label, tooltip);
         elementSpacing += 23;
     }
 
@@ -2646,15 +2657,15 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         int minAlphaX = x + 5;
         int minHueY = y + 29;
         int maxHueY = y + 29 + 123;
-        
+
         if (!col.init) {
             col = realCol;
             col.init = true;
         }
         if (col.AlphaX < x && col.CircleX < x && col.CircleY < y && col.HueYPos < y) {
-            
+
             ColourPickerInit(x - 5, y - 5, col);
-           
+
         }
 
 
@@ -2665,14 +2676,14 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         }
         const ImU32 col_hues[6 + 1] = { IM_COL32(255,0,0,255), IM_COL32(255,255,0,255), IM_COL32(0,255,0,255), IM_COL32(0,255,255,255), IM_COL32(0,0,255,255), IM_COL32(255,0,255,255), IM_COL32(255,0,0,255) };
 
-     /*   if (col.isActive) {*/
-            DrawRectQ(x + 24, y + 5, 9, 9, 3, col.GetU32());
-     /*   }*/
-      /*  else {
-            DrawRectQ(x + 24, y + 5, 9, 9, 3, col.tempCol);
-        }*/
+        /*   if (col.isActive) {*/
+        DrawRectQ(x + 24, y + 5, 9, 9, 3, col.GetU32());
+        /*   }*/
+         /*  else {
+               DrawRectQ(x + 24, y + 5, 9, 9, 3, col.tempCol);
+           }*/
         DrawImageQ(x, y - 1, 40, 20, IM_COL32(255, 255, 255, 255), bucketTexture);
-        DrawRectQ(x, y, 40, 19, 5, IM_COL32(30, 30, 30, 255));
+
 
         ImVec4 hue_color_f(1, 1, 1, 1);
         ImGui::ColorConvertHSVtoRGB(col.hue, 1, 1, hue_color_f.x, hue_color_f.y, hue_color_f.z);
@@ -2680,7 +2691,10 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         float s = 1;
         float v = 1;
         if (cursorInRegion(x, y, 40, 19)) {
-            if (key_pressed(VK_LBUTTON) && !IGui::GO && (!IGui::GK || IGui::calledFromMulti)) {
+
+            DrawRectQ(x, y, 40, 19, 5, IM_COL32(45, 45, 45, 255));
+            if (key_pressed(VK_LBUTTON) && !isOpen["copyPasteTab"].isOpen && !IGui::GO && (!IGui::GK || IGui::calledFromMulti)) {
+
                 col.isClicked = !col.isClicked;
 
                 if (col.isClicked) {
@@ -2695,7 +2709,17 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
                     return Color(0, 0, 0, 0);
 
             }
+            if (key_pressed(VK_RBUTTON) && !IGui::GO && (!IGui::GK || IGui::calledFromMulti)) {
+                col.copyPasteTab = !col.copyPasteTab;
+
+                if (isActive)
+                    return col; // prevents instantly closing colour picker
+                else
+                    return Color(0, 0, 0, 0);
+
+            }
         }
+        DrawRectQ(x, y, 40, 19, 5, IM_COL32(30, 30, 30, 255));
         animLinear("colpicker", 80);
 
         ImVec4 colConv = ColorConvertU32ToFloat4(col.GetU32());
@@ -2880,14 +2904,16 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
             DrawRectQ(x - 1, y + 23 + Y, 157, 182, 3, IM_COL32(38, 38, 38, 255)); // entire background
 
             if (!cursorInRegion(x, y + 24, 165, 225)) {
+
                 if (key_pressed(VK_LBUTTON)) {
-                    col.isClicked = false;
+                    col.isClicked = false; // not this
                     IGui::waiting = true;
 
                     aList[std::make_pair(categoryActiveID, "colpicker")].targetVal = 20;
 
                 }
             }
+
 
             if (key_pressed(VK_ESCAPE)) {
                 col.isClicked = false;
@@ -2899,16 +2925,73 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
         }
 
-      
-       if (isActive)
-           return col; // prevents instantly closing colour picker
+        if (col.copyPasteTab) {
+            ImGui::PushFont(MenuModern);
+            int widthCopy = CalcTextSize("Copy");
+            int widthPaste = CalcTextSize("Paste");
+            ImGui::PopFont();
 
-       return Color(0, 0, 0, 0);
+
+            DrawMessageQ(MenuModern, x + 57, y + 3, "Copy", IM_COL32(210, 210, 210, 255));
+            DrawMessageQ(MenuModern, x + 57, y + 25, "Paste", IM_COL32(210, 210, 210, 255));
+
+            if (cursorInRegion(x + 52, y + 2, widthPaste + 10, 20)) { // copy hover
+
+                DrawRectQ(x + 52, y + 2, widthPaste + 10, 20, 3, IM_COL32(50, 50, 50, 255)); // hover rect
+
+                if (key_pressed(VK_LBUTTON)) {
+                    IGui::ColorClipboard = col;
+                }
+
+            }
+
+
+            DrawRectQ(x + 52, y + 2, widthPaste + 10, 20, 3, IM_COL32(40, 40, 40, 255));
+
+            if (cursorInRegion(x + 52, y + 24, widthPaste + 10, 20)) { // paste hover
+
+                DrawRectQ(x + 52, y + 24, widthPaste + 10, 20, 3, IM_COL32(50, 50, 50, 255)); // hover rect
+
+                if (key_pressed(VK_LBUTTON)) {
+
+                    col = IGui::ColorClipboard;
+                    ColourPickerInit(x - 5, y - 5, col);
+                }
+            }
+
+
+
+            DrawRectQ(x + 52, y + 24, widthPaste + 10, 20, 3, IM_COL32(40, 40, 40, 255));
+
+
+            isOpen["copyPasteTab"].isOpen = true;
+            DrawRectQ(x + 50, y, widthPaste + 14, 46, 5, IM_COL32(30, 30, 30, 255));
+
+            if (!cursorInRegion(x + 50, y, 100, 60)) {
+                if (key_pressed(VK_LBUTTON) || key_pressed(VK_RBUTTON)) {
+                    col.copyPasteTab = false;
+                    isOpen["copyPasteTab"].waiting = true;
+                    if (isActive)
+                        return col; // prevents instantly closing colour picker
+                    else
+                        return Color(0, 0, 0, 0);
+                }
+            }
+
+
+        }
+
+        if (isActive)
+            return col; // prevents instantly closing colour picker
+
+        return Color(0, 0, 0, 0);
     }
-    bool DrawMultiPickerA(int x, int y, bool& change, const char* label, Color& col1, Color& col2, Color& col3, std::vector<const char*> data) {
+    bool DrawMultiPickerA(int x, int y, bool& change, const char* label, Color& col1, Color& col2, Color& col3, std::string id, std::vector<const char*> data) {
         IGui::calledFromMulti = true;
         ImGuiContext& g = *GImGui;
-        
+        std::string preCut = label;
+        std::string idStr = preCut + id;
+
         ImGuiIO& io = g.IO;
         const ImGuiStyle& style = g.Style;
         std::string label2 = label;
@@ -2918,94 +3001,94 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         bool colb1, colb2, colb3;
         for (int i = 0; i < data.size(); i++) { // Drawing the labels next to the colour pickers
             std::string dataLabel = data[i];
-           animLinear2(label2 + dataLabel, 150);
-           float a = aList[std::make_pair(categoryActiveID, label + dataLabel)].value;
+            animLinear2(idStr + dataLabel, 150);
+            float a = aList[std::make_pair(categoryActiveID, idStr + dataLabel)].value;
             ImGui::PushFont(MenuModern);
             int width = CalcTextSize(data[i]); // calculating the width of the text to draw the cross for disabling
             ImGui::PopFont();
             if (width > maxwidth) maxwidth = width;
-            if (mulColMGR[std::make_pair(label, data[0])].mulClicked) {
+            if (mulColMGR[std::make_pair(idStr, data[0])].mulClicked) {
 
-                if ((i == 0 && !mulColMGR[std::make_pair(label, data[0])].isActive || i == 1 && !mulColMGR[std::make_pair(label, data[1])].isActive || i == 2 && !mulColMGR[std::make_pair(label, data[2])].isActive) || aList[std::make_pair(categoryActiveID, label + dataLabel)].inProgress) {
-                 
+                if ((i == 0 && !mulColMGR[std::make_pair(idStr, data[0])].isActive || i == 1 && !mulColMGR[std::make_pair(idStr, data[1])].isActive || i == 2 && !mulColMGR[std::make_pair(idStr, data[2])].isActive) || aList[std::make_pair(categoryActiveID, idStr + dataLabel)].inProgress) {
+
                     DrawLineQ(ImVec2(x + margin + 5, y + 10 + (25 * (i + 1)) + 9), ImVec2(x + margin + 5 + (width * a), y + 10 + (25 * (i + 1)) + 9), 1, IM_COL32(255, 255, 255, 255 * a));
 
                 }
                 if (cursorInRegion(x + margin + 5, y + 5 + (25 * (i + 1)), width, 22)) {
 
                     g.MouseCursor = ImGuiMouseCursor_Hand;
-                    if (key_pressed(VK_LBUTTON)) {
-                        aList[std::make_pair(categoryActiveID, label + dataLabel)].start = std::chrono::high_resolution_clock::now();
+                    if (key_pressed(VK_LBUTTON) && !isOpen["copyPasteTab"].isOpen) {
+                        aList[std::make_pair(categoryActiveID, idStr + dataLabel)].start = std::chrono::high_resolution_clock::now();
                         if (i == 0) {
-                            mulColMGR[std::make_pair(label, data[0])].isActive = !mulColMGR[std::make_pair(label, data[0])].isActive;
-                            mulColMGR[std::make_pair(label, data[0])].ManageColour();
-                            if (!mulColMGR[std::make_pair(label, data[0])].isActive) {
-                               
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].targetVal = 1.f;
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].startVal = 0.f;
+                            mulColMGR[std::make_pair(idStr, data[0])].isActive = !mulColMGR[std::make_pair(idStr, data[0])].isActive;
+                            mulColMGR[std::make_pair(idStr, data[0])].ManageColour();
+                            if (!mulColMGR[std::make_pair(idStr, data[0])].isActive) {
+
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].targetVal = 1.f;
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].startVal = 0.f;
                             }
                             else {
-               
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].targetVal = 0.f;
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].startVal = 1.f;
+
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].targetVal = 0.f;
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].startVal = 1.f;
                             }
                         }
                         if (i == 1) {
-                            mulColMGR[std::make_pair(label, data[1])].isActive = !mulColMGR[std::make_pair(label, data[1])].isActive;
-                            mulColMGR[std::make_pair(label, data[1])].ManageColour();
-                            if (!mulColMGR[std::make_pair(label, data[1])].isActive) {
-                         
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].targetVal = 1.f;
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].startVal = 0.f;
+                            mulColMGR[std::make_pair(idStr, data[1])].isActive = !mulColMGR[std::make_pair(idStr, data[1])].isActive;
+                            mulColMGR[std::make_pair(idStr, data[1])].ManageColour();
+                            if (!mulColMGR[std::make_pair(idStr, data[1])].isActive) {
+
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].targetVal = 1.f;
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].startVal = 0.f;
                             }
                             else {
-                 
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].targetVal = 0.f;
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].startVal = 1.f;
+
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].targetVal = 0.f;
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].startVal = 1.f;
                             }
                         }
                         if (i == 2) {
-                            if (!mulColMGR[std::make_pair(label, data[2])].isActive) {
-                               
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].targetVal = 1.f;
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].startVal = 0.f;
+                            if (!mulColMGR[std::make_pair(idStr, data[2])].isActive) {
+
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].targetVal = 1.f;
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].startVal = 0.f;
                             }
                             else {
-                 
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].targetVal = 0.f;
-                                aList[std::make_pair(categoryActiveID, label + dataLabel)].startVal = 1.f;
+
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].targetVal = 0.f;
+                                aList[std::make_pair(categoryActiveID, idStr + dataLabel)].startVal = 1.f;
                             }
-                            mulColMGR[std::make_pair(label, data[2])].isActive = !mulColMGR[std::make_pair(label, data[2])].isActive;
-                            mulColMGR[std::make_pair(label, data[2])].ManageColour();
+                            mulColMGR[std::make_pair(idStr, data[2])].isActive = !mulColMGR[std::make_pair(idStr, data[2])].isActive;
+                            mulColMGR[std::make_pair(idStr, data[2])].ManageColour();
                         }
                     }
                 }
                 DrawMessageQ(MenuModern, x + margin + 5, y + 10 + (25 * (i + 1)), data[i], IM_COL32(210, 210, 210, 255 - (100 * a))); // text being drawn (visible, not visible)
             }
         }
-        if (mulColMGR[std::make_pair(label, data[0])].mulClicked) {
+        if (mulColMGR[std::make_pair(idStr, data[0])].mulClicked) {
             IGui::GM = true;
             active = true;
 
             maxwidth += 10;
             IGui::GK = true;
 
-            col1 = DrawColourPickerMA(x + margin + maxwidth, y + 35, spareColours[&col1], data[0], label, mulColMGR[std::make_pair(label, data[0])].isActive, col1);
+            col1 = DrawColourPickerMA(x + margin + maxwidth, y + 35, spareColours[&col1], data[0], label, mulColMGR[std::make_pair(idStr, data[0])].isActive, col1);
             DrawRectQ(x + margin + maxwidth - 1, y + 35 - 1, 42, 21, 5, IM_COL32(38, 38, 38, 255));
-            col2 = DrawColourPickerMA(x + margin + maxwidth, y + 60, spareColours[&col2], data[1], label, mulColMGR[std::make_pair(label, data[1])].isActive, col2);
+            col2 = DrawColourPickerMA(x + margin + maxwidth, y + 60, spareColours[&col2], data[1], label, mulColMGR[std::make_pair(idStr, data[1])].isActive, col2);
             DrawRectQ(x + margin + maxwidth - 1, y + 60 - 1, 42, 21, 5, IM_COL32(38, 38, 38, 255));
             if (data.size() == 3) {
-                col3 = DrawColourPickerMA(x + margin + maxwidth, y + 85, spareColours[&col3], data[2], label, mulColMGR[std::make_pair(label, data[2])].isActive, col3);
+                col3 = DrawColourPickerMA(x + margin + maxwidth, y + 85, spareColours[&col3], data[2], label, mulColMGR[std::make_pair(idStr, data[2])].isActive, col3);
                 DrawRectQ(x + margin + maxwidth - 1, y + 85 - 1, 42, 21, 5, IM_COL32(38, 38, 38, 255));
             }
             DrawRectQ(x + margin, y + 30, maxwidth + 44, data.size() * 25 + 4, 3, IM_COL32(32, 32, 32, 255));
             DrawRectQ(x + margin - 1, y + 30 - 1, maxwidth + 46, data.size() * 25 + 6, 3, IM_COL32(38, 38, 38, 255));
 
 
-            if (!cursorInRegion(x + margin - 1, y + 30 - 1, maxwidth + 46, data.size() * 25 + 7)) {
+            if (!cursorInRegion(x + margin - 1, y + 30 - 1, maxwidth + 46, data.size() * 25 + 7) && !isOpen["copyPasteTab"].isOpen) {
                 if ((key_pressed(VK_LBUTTON) && !IGui::GO && IGui::GM)) {
                     IGui::waitingM = true;
-                    mulColMGR[std::make_pair(label, data[0])].mulClicked = false;
+                    mulColMGR[std::make_pair(idStr, data[0])].mulClicked = false;
                     IGui::waitingK = true;
                     // return active;
 
@@ -3018,8 +3101,9 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
 
         if (key_pressed(VK_ESCAPE) && !IGui::GO) {
-            mulColMGR[std::make_pair(label, data[0])].mulClicked = false;
-            IGui::waitingK = true;
+            mulColMGR[std::make_pair(idStr, data[0])].mulClicked = false;
+            IGui::GM = false;
+            IGui::GK = false;
 
         }
 
@@ -3031,10 +3115,10 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         else {
             DrawRectQ(x + 24, y + 5, 9, 9, 3, mulColMGR[std::make_pair(label, id)].tempCol);
         }*/
-      /*  std::string dataLabel = data[0];
-        std::string dataLabel1 = data[1];
-        ImU32 col1D = IM_COL32(col1.Base<COLOR_R>() * 255, col1.Base<COLOR_G>() * 255, col1.Base<COLOR_B>() * 255, 255 * (1.f - aList[std::make_pair(categoryActiveID, label + dataLabel)].value));
-        ImU32 col2D = IM_COL32(col2.Base<COLOR_R>() * 255, col2.Base<COLOR_G>() * 255, col2.Base<COLOR_B>() * 255, 255 * (1.f - aList[std::make_pair(categoryActiveID, label + dataLabel1)].value));*/
+        /*  std::string dataLabel = data[0];
+          std::string dataLabel1 = data[1];
+          ImU32 col1D = IM_COL32(col1.Base<COLOR_R>() * 255, col1.Base<COLOR_G>() * 255, col1.Base<COLOR_B>() * 255, 255 * (1.f - aList[std::make_pair(categoryActiveID, label + dataLabel)].value));
+          ImU32 col2D = IM_COL32(col2.Base<COLOR_R>() * 255, col2.Base<COLOR_G>() * 255, col2.Base<COLOR_B>() * 255, 255 * (1.f - aList[std::make_pair(categoryActiveID, label + dataLabel1)].value));*/
         DrawRectGradientQ(x + margin + 24, y + 5, 9, 9, col1.GetU32(), col1.GetU32(), col2.GetU32(), col2.GetU32());
 
         DrawImageQ(x + margin, y - 1, 40, 20, IM_COL32(255, 255, 255, 255), bucketTexture);
@@ -3045,7 +3129,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
         IGui::calledFromMulti = false;
         if (cursorInRegion(x + margin, y - 1, 40, 20)) {
             if (key_pressed(VK_LBUTTON) && !IGui::GO && !IGui::GM) {
-                mulColMGR[std::make_pair(label, data[0])].mulClicked = !mulColMGR[std::make_pair(label, data[0])].mulClicked;
+                mulColMGR[std::make_pair(idStr, data[0])].mulClicked = !mulColMGR[std::make_pair(idStr, data[0])].mulClicked;
                 return active;
             }
         }
@@ -3053,7 +3137,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
         return active;
     }
-    void dbl::DrawMultiPicker(bool& change, Color& col1, Color& col2, Color& col3, const char* label, std::vector<const char*> data, std::string tooltip) {
+    void dbl::DrawMultiPicker(bool& change, Color& col1, Color& col2, Color& col3, const char* label, std::string id, std::vector<const char*> data, std::string tooltip) {
 
         if (!itemInKeywords(label)) {
             KeyWordInfo add;
@@ -3070,8 +3154,8 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
 
         }
 
-        DrawMultiPickerA(childX, childY + elementSpacing, change, label, col1, col2, col3, data);
-        DrawCheckBoxA(childX, childY + elementSpacing, change, label, tooltip);
+        DrawMultiPickerA(childX, childY + elementSpacing, change, label, col1, col2, col3, id, data);
+        DrawCheckBoxA(childX, childY + elementSpacing, change, label, id, tooltip);
         elementSpacing += 23;
     }
 
@@ -3087,7 +3171,7 @@ constexpr auto windowFlags = ImGuiWindowFlags_NoResize
             keywordList.emplace_back(add);
 
         }
-        DrawCheckBoxA(childX, childY + elementSpacing, change, label, "");
+        DrawCheckBoxA(childX, childY + elementSpacing, change, label, "someid", "");
         DrawColourPickerA(childX + 190, childY + elementSpacing + 1, col, label);
         elementSpacing += 25;
     }

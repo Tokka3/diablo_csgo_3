@@ -137,13 +137,17 @@ void W::MainWindow(IDirect3DDevice9* pDevice)
 				db->DrawDropDown(C::Get<int>(Vars.iEspMainPlayerBox), { "Full", "Corners" }, "Box Type");
 
 				db->DrawMultiPicker(C::Get<bool>(Vars.bFill), C::Get<Color2>(Vars.cFillColour).visible, C::Get<Color2>(Vars.cFillColour).notVisible, C::Get<Color2>(Vars.cFillColour).visible, "Fill");
-				db->DrawMultiPicker(C::Get<bool>(Vars.bOutline), C::Get<Color2>(Vars.cOutlineColour).visible, C::Get<Color2>(Vars.cOutlineColour).notVisible, C::Get<Color2>(Vars.cBoxColour).visible, "Outline");
+				db->DrawMultiPicker(C::Get<bool>(Vars.bOutline), C::Get<Color2>(Vars.cOutlineColour).visible, C::Get<Color2>(Vars.cOutlineColour).notVisible, C::Get<Color2>(Vars.cBoxColour).visible, "Outline", "out1");
 				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bSkeleton), C::Get<Color2>(Vars.cSkeletonColour).visible, C::Get<Color2>(Vars.cSkeletonColour).notVisible, C::Get<Color2>(Vars.cSkeletonColour).visible, "Skeleton");
 				db->DrawSliderInt(C::Get<int>(Vars.iSkeletonThickness), 1, 6, "Thickness");
 				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bHealthbar), C::Get<Color2>(Vars.cHealthBarColour).visible, C::Get<Color2>(Vars.cHealthBarColour).notVisible, C::Get<Color2>(Vars.cHealthBarColour).visible, "Health Bar");
+				db->DrawDropDown(C::Get<int>(Vars.iHealthStyle), { "Dynamic", "Static" }, " Health Bar Style");
+				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bAmmoBar), C::Get<Color2>(Vars.cAmmoBarColour).visible, C::Get<Color2>(Vars.cAmmoBarColour).notVisible, C::Get<Color2>(Vars.cAmmoBarColour).visible, "Ammo Bar");
+				db->DrawMultiPicker(C::Get<bool>(Vars.bAmmoBarOutline), C::Get<Color2>(Vars.cAmmoBarColourOutline).visible, C::Get<Color2>(Vars.cAmmoBarColourOutline).notVisible, C::Get<Color2>(Vars.cAmmoBarColour).visible, "Outline", "out2");
+				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bArmorBar), C::Get<Color2>(Vars.cArmorBarColour).visible, C::Get<Color2>(Vars.cArmorBarColour).notVisible, C::Get<Color2>(Vars.cArmorBarColour).visible, "Armor Bar");
 				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bName), C::Get<Color2>(Vars.colEspName).visible, C::Get<Color2>(Vars.colEspName).notVisible, C::Get<Color2>(Vars.colEspName).visible, "Name");
@@ -165,13 +169,17 @@ void W::MainWindow(IDirect3DDevice9* pDevice)
 				db->DrawDropDown(C::Get<int>(Vars.iEspMainPlayerBox), { "Full", "Corners" }, "Box Type");
 
 				db->DrawMultiPicker(C::Get<bool>(Vars.bFillA), C::Get<Color2>(Vars.cFillColourA).visible, C::Get<Color2>(Vars.cFillColourA).notVisible, C::Get<Color2>(Vars.cFillColourA).visible, "Fill");
-				db->DrawMultiPicker(C::Get<bool>(Vars.bOutlineA), C::Get<Color2>(Vars.cOutlineColourA).visible, C::Get<Color2>(Vars.cOutlineColourA).notVisible, C::Get<Color2>(Vars.cBoxColourA).visible, "Outline");
+				db->DrawMultiPicker(C::Get<bool>(Vars.bOutlineA), C::Get<Color2>(Vars.cOutlineColourA).visible, C::Get<Color2>(Vars.cOutlineColourA).notVisible, C::Get<Color2>(Vars.cBoxColourA).visible, "Outline", "id1");
 				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bSkeletonA), C::Get<Color2>(Vars.cSkeletonColourA).visible, C::Get<Color2>(Vars.cSkeletonColourA).notVisible, C::Get<Color2>(Vars.cSkeletonColourA).visible, "Skeleton");
 				db->DrawSliderInt(C::Get<int>(Vars.iSkeletonThicknessA), 1, 6, "Thickness ");
 				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bHealthbarA), C::Get<Color2>(Vars.cHealthBarColourA).visible, C::Get<Color2>(Vars.cHealthBarColourA).notVisible, C::Get<Color2>(Vars.cHealthBarColourA).visible, "Health Bar");
+				db->DrawDropDown(C::Get<int>(Vars.iHealthStyle), { "Dynamic", "Static" }, " Health Bar Style");
+				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bAmmoBarA), C::Get<Color2>(Vars.cAmmoBarColourA).visible, C::Get<Color2>(Vars.cAmmoBarColourA).notVisible, C::Get<Color2>(Vars.cAmmoBarColourA).visible, "Ammo Bar");
+				db->DrawMultiPicker(C::Get<bool>(Vars.bAmmoBarOutlineA), C::Get<Color2>(Vars.cAmmoBarColourOutlineA).visible, C::Get<Color2>(Vars.cAmmoBarColourOutlineA).notVisible, C::Get<Color2>(Vars.cAmmoBarColour).visible, "Outline", "id2");
+				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bArmorBarA), C::Get<Color2>(Vars.cArmorBarColourA).visible, C::Get<Color2>(Vars.cArmorBarColourA).notVisible, C::Get<Color2>(Vars.cArmorBarColourA).visible, "Armor Bar");
 				db->Separator();
 				db->DrawMultiPicker(C::Get<bool>(Vars.bNameA), C::Get<Color2>(Vars.colEspNameA).visible, C::Get<Color2>(Vars.colEspNameA).notVisible, C::Get<Color2>(Vars.colEspNameA).visible, "Name");

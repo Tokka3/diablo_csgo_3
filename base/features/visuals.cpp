@@ -18,6 +18,9 @@
 #include "../utilities.h"
 
 // @note: avoid store imcolor, store either u32 of imvec4
+
+bool isEnemy = false;
+bool isVisible = false;
 void CVisuals::Store()
 {
 	CBaseEntity* pLocal = CBaseEntity::GetLocalPlayer();
@@ -1018,8 +1021,9 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 			pLocal->IsVisible(pEntity, pEntity->GetBonePosition(BONE_HEAD).value_or(pEntity->GetEyePosition(false))) ? C::Get<Color2>(Vars.cBoxColour).visible : C::Get<Color2>(Vars.cBoxColour).notVisible :
 			pLocal->IsVisible(pEntity, pEntity->GetBonePosition(BONE_HEAD).value_or(pEntity->GetEyePosition(false))) ? C::Get<Color>(Vars.colEspMainBoxAllies) : C::Get<Color>(Vars.colEspMainBoxAlliesWall);
 		
-		bool isVisible = pLocal->IsVisible(pEntity, pEntity->GetBonePosition(BONE_HEAD).value_or(pEntity->GetEyePosition(false)));
-	
+		 isVisible = pLocal->IsVisible(pEntity, pEntity->GetBonePosition(BONE_HEAD).value_or(pEntity->GetEyePosition(false)));
+		isEnemy = pEntity->IsEnemy(pLocal);
+		
 
 		//for (int i = 1; i < 127; i++)
 		//{
@@ -1036,9 +1040,9 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 		//	*/D::AddLine(childPos, ParentPos, Color(255, 255, 255, 255), C::Get<int>(Vars.iSkeletonThickness));
 		//}
 		//
-		Box(ctx.box, C::Get<int>(Vars.iEspMainPlayerBox), colBox, Color(0, 0, 0, 150), isVisible);
+		Box(ctx.box, C::Get<int>(Vars.iEspMainPlayerBox), colBox, Color(0, 0, 0, 150), isVisible, isEnemy);
 
-		if (C::Get<bool>(Vars.bSkeleton)) {
+		if (C::Get<bool>(Vars.bSkeleton) && pEntity->IsEnemy(pLocal) || C::Get<bool>(Vars.bSkeletonA) && !pEntity->IsEnemy(pLocal)) {
 			if (const auto pModel = pEntity->GetModel(); pModel != nullptr)
 			{
 
@@ -1056,7 +1060,12 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 								if (pBone->iParent == -1) continue;
 								D::WorldToScreen(pEntity->GetBonePosition(pBone->iParent).value(), ParentPos);
 
-								D::AddLine(childPos, ParentPos, isVisible ? C::Get<Color2>(Vars.cSkeletonColour).visible : C::Get<Color2>(Vars.cSkeletonColour).notVisible, C::Get<int>(Vars.iSkeletonThickness));
+								D::AddLine(childPos, ParentPos, pEntity->IsEnemy(pLocal) ?
+									
+									(isVisible ? C::Get<Color2>(Vars.cSkeletonColour).visible : C::Get<Color2>(Vars.cSkeletonColour).notVisible) :
+
+									
+									(isVisible ? C::Get<Color2>(Vars.cSkeletonColourA).visible : C::Get<Color2>(Vars.cSkeletonColourA).notVisible), C::Get<int>(pEntity->IsEnemy(pLocal) ? Vars.iSkeletonThickness : Vars.iSkeletonThicknessA));
 							}
 						}
 					}
@@ -1106,7 +1115,7 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 	if (CBaseCombatWeapon* pActiveWeapon = pEntity->GetWeapon(); pActiveWeapon != nullptr)
 	{
 		// ammo bar
-		if (C::Get<bool>(Vars.bAmmoBar))
+		if (C::Get<bool>(Vars.bAmmoBar) && pEntity->IsEnemy(pLocal) || C::Get<bool>(Vars.bAmmoBarA) && !pEntity->IsEnemy(pLocal))
 			AmmoBar(pEntity, pActiveWeapon, ctx, Color(80, 180, 200), Color(40, 40, 40, 100), Color(0, 0, 0, 150));
 
 		// get all other weapons
@@ -1156,7 +1165,7 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 	#pragma endregion
 
 	#pragma region visuals_player_left
-	if (C::Get<bool>(Vars.bHealthbar))
+	if (C::Get<bool>(Vars.bHealthbar) && isEnemy || C::Get<bool>(Vars.bHealthbar) && !isEnemy)
 	{
 		// calculate hp-based color
 		const float flFactor = static_cast<float>(pEntity->GetHealth()) / static_cast<float>(pEntity->GetMaxHealth());
@@ -1209,22 +1218,46 @@ void CVisuals::Player(CBaseEntity* pLocal, CBaseEntity* pEntity, Context_t& ctx,
 	#pragma endregion
 }
 
-void CVisuals::Box(const Box_t& box, const int nBoxType, const Color& colPrimary, const Color& colOutline, bool isVisible)
+void CVisuals::Box(const Box_t& box, const int nBoxType, const Color& colPrimary, const Color& colOutline, bool isVisible, bool isEnemy)
 {
 
-	bool fill = C::Get<bool>(Vars.bFill);
-	bool outline =  C::Get<bool>(Vars.bOutline);
-	Color fillColor = isVisible ? C::Get<Color2>(Vars.cFillColour).visible :  C::Get<Color2>(Vars.cFillColour).notVisible ;
-	Color outlineColor = isVisible ? C::Get<Color2>(Vars.cOutlineColour).visible : C::Get<Color2>(Vars.cOutlineColour).notVisible;
-	Color espColor = isVisible ? C::Get<Color2>(Vars.cBoxColour).visible :  C::Get<Color2>(Vars.cBoxColour).notVisible;
+	bool fill = C::Get<bool>(Vars.bFill) && isEnemy || C::Get<bool>(Vars.bFillA) && !isEnemy;
+	bool outline = C::Get<bool>(Vars.bOutline) && isEnemy || C::Get<bool>(Vars.bOutlineA) && !isEnemy;
+	Color fillColor = isEnemy ? (isVisible ? C::Get<Color2>(Vars.cFillColour).visible :  C::Get<Color2>(Vars.cFillColour).notVisible) : 
+							    (isVisible ? C::Get<Color2>(Vars.cFillColourA).visible : C::Get<Color2>(Vars.cFillColourA).notVisible);
+	Color outlineColor = isEnemy ? isVisible ? C::Get<Color2>(Vars.cOutlineColour).visible : C::Get<Color2>(Vars.cOutlineColour).notVisible:
+									isVisible ? C::Get<Color2>(Vars.cOutlineColourA).visible : C::Get<Color2>(Vars.cOutlineColourA).notVisible;
+
+	Color espColor = isEnemy ? 
+		
+		isVisible ? C::Get<Color2>(Vars.cBoxColour).visible :  C::Get<Color2>(Vars.cBoxColour).notVisible : 
+
+
+		isVisible ? C::Get<Color2>(Vars.cBoxColourA).visible : C::Get<Color2>(Vars.cBoxColourA).notVisible;
+
+
+
+
+	
 	switch (static_cast<EVisualsBoxType>(nBoxType))
 	{
+		
+
 	case EVisualsBoxType::FULL:
 	{
-		if (!C::Get<bool>(Vars.bEspMainEnemies)) break;
+		if (isEnemy) {
+			if (!C::Get<bool>(Vars.bEspMainEnemies)) break;
+			if (!C::Get<bool>(Vars.bBox)) break;
+		}
 
-		if (!C::Get<bool>(Vars.bBox)) break;
+		if (!isEnemy) {
+			if (!C::Get<bool>(Vars.bEspMainAllies)) break;
+			if (!C::Get<bool>(Vars.bBoxA)) break;
+		}
 
+	/*	if (!(C::Get<bool>(Vars.bEspMainEnemies) || C::Get<bool>(Vars.bEspMainAllies))) break;
+		if (!(C::Get<bool>(Vars.bBox) || C::Get<bool>(Vars.bBoxA))) break;*/
+	
 		if (fill) {
 			D::AddRect(ImVec2(box.left, box.top), ImVec2(box.right, box.bottom), fillColor,  DRAW_RECT_FILLED);
 		}
@@ -1241,6 +1274,16 @@ void CVisuals::Box(const Box_t& box, const int nBoxType, const Color& colPrimary
 	}
 	case EVisualsBoxType::CORNERS:
 	{
+		if (isEnemy) {
+			if (!C::Get<bool>(Vars.bEspMainEnemies)) break;
+			if (!C::Get<bool>(Vars.bBox)) break;
+		}
+
+		if (!isEnemy) {
+			if (!C::Get<bool>(Vars.bEspMainAllies)) break;
+			if (!C::Get<bool>(Vars.bBoxA)) break;
+		}
+
 		// num of parts we divide the whole line
 		constexpr int nDivideParts = 5;
 
@@ -1278,13 +1321,31 @@ void CVisuals::HealthBar(Context_t& ctx, const float flFactor, const Color& colP
 	// background
 	D::AddRect(ImVec2(ctx.box.left - 5 - ctx.arrPadding.at(DIR_LEFT), ctx.box.top), ImVec2(ctx.box.left - 3 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom), colBackground, DRAW_RECT_FILLED | DRAW_RECT_OUTLINE, colOutline);
 	// bar
-	D::AddRect(ImVec2(ctx.box.left - 5 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom - (ctx.box.height * flFactor)), ImVec2(ctx.box.left - 3 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom), colPrimary, DRAW_RECT_FILLED);
+
+	if (C::Get<int>(Vars.iHealthStyle) == 0) {
+		D::AddRect(ImVec2(ctx.box.left - 5 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom - (ctx.box.height * flFactor)), ImVec2(ctx.box.left - 3 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom), colPrimary, DRAW_RECT_FILLED);
+	}
+	else {
+		Color col = isEnemy ? (isVisible ? C::Get<Color2>(Vars.cHealthBarColour).visible : C::Get<Color2>(Vars.cHealthBarColour).notVisible) :
+			(isVisible ? C::Get<Color2>(Vars.cHealthBarColourA).visible : C::Get<Color2>(Vars.cHealthBarColourA).notVisible);
+
+			D::AddRect(ImVec2(ctx.box.left - 5 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom - (ctx.box.height * flFactor)), ImVec2(ctx.box.left - 3 - ctx.arrPadding.at(DIR_LEFT), ctx.box.bottom), col, DRAW_RECT_FILLED);
+	}
 	ctx.arrPadding.at(DIR_LEFT) += 6.0f;
 }
 
 void CVisuals::AmmoBar(CBaseEntity* pEntity, CBaseCombatWeapon* pWeapon, Context_t& ctx, const Color& colPrimary, const Color& colBackground, const Color& colOutline)
 {
+	Color col = isEnemy ? isVisible ? C::Get<Color2>(Vars.cAmmoBarColour).visible : C::Get<Color2>(Vars.cAmmoBarColour).notVisible :
+		isVisible ? C::Get<Color2>(Vars.cAmmoBarColourA).visible : C::Get<Color2>(Vars.cAmmoBarColourA).notVisible;
 	CCSWeaponData* pWeaponData = I::WeaponSystem->GetWeaponData(pWeapon->GetItemDefinitionIndex());
+
+	Color colOutlineBar = isEnemy ?
+
+		isVisible ? C::Get<Color2>(Vars.cAmmoBarColourOutline).visible : C::Get<Color2>(Vars.cAmmoBarColourOutline).notVisible :
+
+		
+		isVisible ? C::Get<Color2>(Vars.cAmmoBarColourOutlineA).visible : C::Get<Color2>(Vars.cAmmoBarColourOutlineA).notVisible;
 
 	if (pWeaponData == nullptr)
 		return;
@@ -1320,9 +1381,10 @@ void CVisuals::AmmoBar(CBaseEntity* pEntity, CBaseCombatWeapon* pWeapon, Context
 		flFactor = static_cast<float>(iAmmo) / static_cast<float>(iMaxAmmo);
 
 	// background
-	D::AddRect(ImVec2(ctx.box.left, ctx.box.bottom + 3 + ctx.arrPadding.at(DIR_BOTTOM)), ImVec2(ctx.box.right, ctx.box.bottom + 5 + ctx.arrPadding.at(DIR_BOTTOM)), colBackground, DRAW_RECT_FILLED | DRAW_RECT_OUTLINE, colOutline);
+	D::AddRect(ImVec2(ctx.box.left, ctx.box.bottom + 3 + ctx.arrPadding.at(DIR_BOTTOM)), ImVec2(ctx.box.right, ctx.box.bottom + 5 + ctx.arrPadding.at(DIR_BOTTOM)), colOutlineBar, DRAW_RECT_FILLED | DRAW_RECT_OUTLINE, colOutlineBar);
 	// bar
-	D::AddRect(ImVec2(ctx.box.left, ctx.box.bottom + 3 + ctx.arrPadding.at(DIR_BOTTOM)), ImVec2(ctx.box.left + ctx.box.width * flFactor, ctx.box.bottom + 5 + ctx.arrPadding.at(DIR_BOTTOM)), colPrimary, DRAW_RECT_FILLED);
+	if (C::Get<bool>(Vars.bAmmoBarOutline) && isEnemy || C::Get<bool>(Vars.bAmmoBarOutlineA) && !isEnemy)
+	D::AddRect(ImVec2(ctx.box.left, ctx.box.bottom + 3 + ctx.arrPadding.at(DIR_BOTTOM)), ImVec2(ctx.box.left + ctx.box.width * flFactor, ctx.box.bottom + 5 + ctx.arrPadding.at(DIR_BOTTOM)), col, DRAW_RECT_FILLED);
 	ctx.arrPadding.at(DIR_BOTTOM) += 6.0f;
 }
 

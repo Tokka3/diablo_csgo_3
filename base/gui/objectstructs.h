@@ -146,7 +146,11 @@ struct d_timer {
     std::chrono::steady_clock::time_point start;
     bool inProgress = false;
 };
-std::map< std::pair<int, std::string>, anim> aList{
+std::map< std::pair<int,    std::string>, anim> aList{
+
+};
+
+std::map< std::pair<int, bool*>, anim> aListCB{
 
 };
 
@@ -164,6 +168,15 @@ std::map<std::string, Color> colMGR{
 
 };
 
+struct openMGR {
+    bool isOpen = false;
+    bool waiting = false;
+};
+std::map<std::string, openMGR> isOpen{
+
+};
+
+
 
 
 std::map<Color*, Color> spareColours{
@@ -171,7 +184,7 @@ std::map<Color*, Color> spareColours{
 };
 
 
-std::map<std::pair<const char*, const char*>, Color> mulColMGR{
+std::map<std::pair<std::string, std::string>, Color> mulColMGR{
 
 };
 
